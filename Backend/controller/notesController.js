@@ -9,21 +9,23 @@ const addNotes = async (req, res) => {
     ({ title, content, tags } = req.body);
 
     // if (!title) {
-    //   res.status(400).json({ success: false, message: "Please enter tittle" });
+    //   return res.status(400).json({ success: false, message: "Please enter tittle" });
     // }
     // if (!content) {
-    //   res.status(400).json({ success: false, message: "Please enter content" });
+    //  return res.status(400).json({ success: false, message: "Please enter content" });
     // }
   } catch (error) {
-    return res
-      .status(400)
-      .json({ success: false, message: "Invalid request body" });
+    return res.status(400).json({
+      success: false,
+      message:
+        "Invalid request body, Please enter a tittle and content or tags",
+    });
   }
 
   const userID = req.user.userID;
   //   const userIDD = req.user;
 
-  console.log(`From line 17: ${userID}`);
+  // console.log(`From line 17: ${userID}`);
   //   console.log(`From line 18: ${userIDD._id}`);
 
   try {
@@ -40,8 +42,84 @@ const addNotes = async (req, res) => {
   } catch (error) {
     return res
       .status(500)
-      .json({ success: false, message: "failed to add new user note " });
+      .json({ success: true, message: "failed to add new user note " });
   }
 };
 
-module.exports = { addNotes };
+// function to edit or update notes
+const editNotes = async (req, res) => {
+  const notesID = req.params.noteID;
+
+  const userID = req.user.userID;
+
+  const { title, content, tags, isPinned } = req.body;
+
+  if (!title && !content && !tags) {
+    return res
+      .status(400)
+      .json({ success: false, message: "No changes provided" });
+  }
+
+  // let title, content, tags, isPinned;
+
+  // try {
+  //   ({ title, content, tags, isPinned } = req.body);
+  //   if (!title && !content && !tags) {
+  //     return res.status(400).json({ success: false, message: "No changes provided" });
+  //   }
+  // } catch (error) {
+  //   return res.status(500).json({
+  //     success: true,
+  //     message: "Invalid notes request body",
+  //   });
+  // }
+
+  // Safe destructuring with default values
+  // const { title, content, tags, isPinned } = req.body || {};
+
+  // // Check if any fields are provided for update
+  // if (!title && !content && !tags && isPinned === undefined) {
+  //   return res.status(400).json({
+  //     success: false,
+  //     message: "No changes provided",
+  //   });
+  // }
+
+  try {
+    const editedNote = await Notes.findOne({ _id: notesID, userID });
+
+    if (!editedNote) {
+      return res
+        .status(400)
+        .json({ success: true, message: "Notes not found" });
+    }
+
+    if (title) {
+      editedNote.title = title;
+    }
+    if (content) {
+      editedNote.content = content;
+    }
+    if (tags) {
+      editedNote.tags = tags;
+    }
+    if (isPinned) {
+      editedNote.isPinned = isPinned;
+    }
+
+    await editedNote.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Notes edited successfully",
+      editedNote,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: true,
+      message: "Internal server error, Failed to edit notes",
+    });
+  }
+};
+
+module.exports = { addNotes, editNotes };
