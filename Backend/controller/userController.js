@@ -122,4 +122,26 @@ const login = async (req, res) => {
   }
 };
 
-module.exports = { createUser, login };
+const getUser = async (req, res) => {
+  const userID = req.user.userID;
+
+  const isUser = await User.findOne({ _id: userID });
+  if (!isUser) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Can't fetch user " });
+  }
+
+  return res.status(200).json({
+    success: true,
+    message: "User fetched successfully",
+    user: {
+      fullName: isUser.fullName,
+      email: isUser.email,
+      _id: isUser._id,
+      createdOn: isUser.createdOn,
+    },
+  });
+};
+
+module.exports = { createUser, login, getUser };

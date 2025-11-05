@@ -52,28 +52,30 @@ const editNotes = async (req, res) => {
 
   const userID = req.user.userID;
 
-  const { title, content, tags, isPinned } = req.body;
-
-  if (!title && !content && !tags) {
-    return res
-      .status(400)
-      .json({ success: false, message: "No changes provided" });
-  }
-
-  // let title, content, tags, isPinned;
-
-  // try {
-  //   ({ title, content, tags, isPinned } = req.body);
-  //   if (!title && !content && !tags) {
-  //     return res.status(400).json({ success: false, message: "No changes provided" });
-  //   }
-  // } catch (error) {
-  //   return res.status(500).json({
-  //     success: true,
-  //     message: "Invalid notes request body",
-  //   });
+  // This works but prints an error in the console
+  // const { title, content, tags, isPinned } = req.body;
+  // if (!title && !content && !tags) {
+  //   return res
+  //     .status(400)
+  //     .json({ success: false, message: "No changes provided" });
   // }
 
+  let title, content, tags, isPinned;
+
+  try {
+    ({ title, content, tags, isPinned } = req.body);
+    if (!title && !content && !tags) {
+      return res
+        .status(400)
+        .json({ success: false, message: "No changes provided" });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      success: true,
+      message: "Invalid notes request body",
+    });
+  }
+  // This also works but I think I prefer what is above
   // Safe destructuring with default values
   // const { title, content, tags, isPinned } = req.body || {};
 
@@ -122,4 +124,101 @@ const editNotes = async (req, res) => {
   }
 };
 
-module.exports = { addNotes, editNotes };
+// get all notes
+const getAllNotes = async (req, res) => {
+  const userID = req.user.userID;
+  try {
+    const allNotes = await Notes.find({ userID }).sort({ isPinned: -1 });
+
+    return res.status(200).json({
+      success: true,
+      message: "All notes are fetched successfully",
+      allNotes,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: true,
+      message: "Internal server error, failed to fetch all notes",
+    });
+  }
+};
+
+// delete Note
+const deleteNote = async (req, res) => {
+  // get the notes ID from the URL params
+  const noteID = req.params.noteID;
+  // get the note ID from the json web token of the user
+  const userID = req.user.userID;
+
+  try {
+    const findNote = await Notes.findOne({ _id: noteID, userID });
+
+    if (!findNote) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Note not found" });
+    }
+
+    await Notes.deleteOne({ _id: noteID, userID });
+
+    return res
+      .status(200)
+      .json({ success: true, message: "Note deleted successfully" });
+  } catch (error) {
+    return res.status(500).json({
+      success: true,
+      message: "Internal server error, Note not found",
+    });
+  }
+};
+
+const updatePinnedNote = async (req, res) => {
+  const notesID = req.params.noteID;
+
+  const userID = req.user.userID;
+
+  // Safe destructuring with default values
+  const { isPinned } = req.body || {};
+  // // Check if any fields are provided for update
+  if (!isPinned) {
+    return res.status(400).json({
+      success: false,
+      message: "Pinned changes not provided",
+    });
+  }
+
+  try {
+    const editedNote = await Notes.findOne({ _id: notesID, userID });
+
+    if (!editedNote) {
+      return res
+        .status(400)
+        .json({ success: true, message: "Notes not found" });
+    }
+
+    if (isPinned) {
+      editedNote.isPinned = isPinned;
+    }
+
+    await editedNote.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Pinned mote edited successfully",
+      editedNote,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: true,
+      message: "Internal server error, Failed to edit pinned notes",
+    });
+  }
+};
+
+module.exports = {
+  addNotes,
+  editNotes,
+  getAllNotes,
+  deleteNote,
+  updatePinnedNote,
+};
