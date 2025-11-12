@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import PasswordInput from "../../components/Input/PasswordInput";
 
 // import context
@@ -8,11 +8,16 @@ import { useGlobalContext } from "../../Context";
 // import validateEmail
 import { validateEmail } from "../../utils/helper";
 
+// import axios instance
+import axiosInstance from "../../utils/axiosinstance";
+
 const Login = () => {
   const { email, setEmail, password, setPassword, error, setError } =
     useGlobalContext();
 
-  const handleLogin = (e) => {
+  const navigate = useNavigate();
+
+  const handleLogin = async (e) => {
     e.preventDefault();
 
     if (!validateEmail(email)) {
@@ -22,7 +27,30 @@ const Login = () => {
       return setError("Please enter your password");
     }
     setError("");
+
     // Login API call
+    try {
+      const response = await axiosInstance.post("/login", {
+        email: email,
+        password: password,
+      });
+
+      // Handle successful login
+      if (response.data && response.data.accessToken) {
+        localStorage.setItem("token", response.data.accessToken);
+        navigate("/dashboard");
+      }
+    } catch (error) {
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        setError(error.response.data.message);
+      } else {
+        setError("An unexpected error occurred,. Please try again");
+      }
+    }
   };
   return (
     <>

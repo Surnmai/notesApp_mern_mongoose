@@ -6,13 +6,13 @@ const bcrypt = require("bcrypt");
 const createUser = async (req, res) => {
   try {
     // get the user info from the form
-    const { fullname, email, password } = req.body;
+    const { fullName, email, password } = req.body;
 
     // validate registration fields
-    if (!fullname) {
+    if (!fullName) {
       return res
         .status(401)
-        .json({ success: false, message: "Full name is required" });
+        .json({ success: false, message: "Fullname is required" });
     }
     if (!email) {
       return res
@@ -40,7 +40,7 @@ const createUser = async (req, res) => {
 
     // create a new user
     const newUser = await User.create({
-      fullname,
+      fullName,
       email,
       password: hashPassword,
     });
@@ -55,6 +55,12 @@ const createUser = async (req, res) => {
         success: true,
         accessToken,
         message: "User created/registered successfully",
+        user: {
+          fullName: isUser.fullName,
+          email: isUser.email,
+          _id: isUser._id,
+          createdOn: isUser.createdOn,
+        },
       });
     } else {
       return res.status(401).json({

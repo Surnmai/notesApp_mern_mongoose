@@ -19,6 +19,8 @@ export const AppProvider = ({ children }) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [tags, setTags] = useState([]);
+  const [userInfo, setUserInfo] = useState(null);
+  const [getNotes, setGetNotes] = useState([]);
 
   const toggleShowPassword = () => {
     setIsShowPassword(!isShowPassword);
@@ -50,6 +52,10 @@ export const AppProvider = ({ children }) => {
         setContent,
         tags,
         setTags,
+        userInfo,
+        setUserInfo,
+        getNotes,
+        setGetNotes,
       }}
     >
       {children}

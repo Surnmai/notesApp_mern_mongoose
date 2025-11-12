@@ -7,7 +7,7 @@ const {
   getAllNotes,
   deleteNote,
   updatePinnedNote,
-} = require("../controller/notesController.js");
+} = require("../controllers/notesController");
 
 // import middleware
 const authenticateToken = require("../middleware/utilities");

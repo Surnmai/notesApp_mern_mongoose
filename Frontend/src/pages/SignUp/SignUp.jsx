@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import PasswordInput from "../../components/Input/PasswordInput";
 
 // import context
@@ -8,7 +8,11 @@ import { useGlobalContext } from "../../Context";
 // import validateEmail
 import { validateEmail } from "../../utils/helper";
 
+// import axios instance
+import axiosInstance from "../../utils/axiosinstance";
+
 const SignUp = () => {
+  const navigate = useNavigate();
   const {
     email,
     setEmail,
@@ -20,7 +24,7 @@ const SignUp = () => {
     setName,
   } = useGlobalContext();
 
-  const handleSignUp = (e) => {
+  const handleSignUp = async (e) => {
     e.preventDefault();
 
     if (!name) {
@@ -38,7 +42,36 @@ const SignUp = () => {
     setError("");
 
     // Sign Up API call
+    try {
+      const response = await axiosInstance.post("/create-account ", {
+        fullName: name,
+        email: email,
+        password: password,
+      });
+
+      // Handle successful registration response
+      if (response.data && response.data.error) {
+        setError(response.data.message);
+        return;
+      }
+
+      if (response.data && response.data.accessToken) {
+        localStorage.setItem("token", response.data.accessToken);
+        navigate("/dashboard");
+      }
+    } catch (error) {
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        setError(error.response.data.message);
+      } else {
+        setError("An unexpected error occurred,. Please try again");
+      }
+    }
   };
+
   return (
     <>
       <div className=" grid place-items-center mt-28">

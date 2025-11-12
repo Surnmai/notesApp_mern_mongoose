@@ -38,7 +38,7 @@ const addNotes = async (req, res) => {
     await note.save();
     return res
       .status(200)
-      .json({ success: true, message: "Note added successfully" });
+      .json({ success: true, message: "Note added successfully", note });
   } catch (error) {
     return res
       .status(500)

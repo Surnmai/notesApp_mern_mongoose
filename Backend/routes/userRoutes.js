@@ -2,7 +2,7 @@ const express = require("express");
 
 const jwtMiddleWare = require("../middleware/utilities");
 
-const { createUser, login, getUser } = require("../controller/userController");
+const { createUser, login, getUser } = require("../controllers/userController");
 
 const router = express.Router();
 

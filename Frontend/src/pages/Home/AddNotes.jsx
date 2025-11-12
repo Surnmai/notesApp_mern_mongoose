@@ -9,20 +9,36 @@ import { useGlobalContext } from "../../Context";
 // import React Icons
 import { MdClose } from "react-icons/md";
 
-const AddNotes = ({ noteData, type, onClose }) => {
-  const {
-    content,
-    setContent,
-    tags,
-    setTags,
-    title,
-    setTitle,
-    error,
-    setError,
-  } = useGlobalContext();
+// import axis Instance
+import axiosInstance from "../../utils/axiosinstance";
+
+const AddNotes = ({ noteData, type, onClose, getAllNotes }) => {
+  const { content, setContent, tags, title, setTitle, error, setError } =
+    useGlobalContext();
 
   // Add Note
-  const addNewNote = async () => {};
+  const addNewNote = async () => {
+    try {
+      const response = await axiosInstance.post("/notes/add-notes", {
+        title,
+        content,
+        tags,
+      });
+
+      if (response.data && response.data.note) {
+        getAllNotes();
+        onClose();
+      }
+    } catch (error) {
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        setError(error.response.data.message);
+      }
+    }
+  };
 
   // Edit Note
   const editNote = async () => {};
@@ -78,7 +94,7 @@ const AddNotes = ({ noteData, type, onClose }) => {
 
       <div className="mt-3">
         <label className="input-label">TAGS</label>
-        <TagInput tags={tags} setTags={setTags} />
+        <TagInput />
       </div>
 
       {error && <p className="text-red-500 text-xs pt-4">{error}</p>}

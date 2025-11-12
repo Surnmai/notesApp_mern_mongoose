@@ -4,8 +4,8 @@ import { MdAdd, MdClose } from "react-icons/md";
 // import Global Context
 import { useGlobalContext } from "../../Context";
 
-const TagInput = ({ tags, setTags }) => {
-  const { inputValue, setInputValue } = useGlobalContext();
+const TagInput = () => {
+  const { inputValue, setInputValue, tags, setTags } = useGlobalContext();
 
   const handleInputChange = (e) => {
     setInputValue(e.target.value);
@@ -20,6 +20,7 @@ const TagInput = ({ tags, setTags }) => {
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
+      e.preventDefault(); // To prevent form submission
       addNewTag();
     }
   };
@@ -61,9 +62,7 @@ const TagInput = ({ tags, setTags }) => {
           />
           <button
             className="w-8 h-8 flex items-center justify-center rounded border bg-white hover:bg-blue-700"
-            onClick={() => {
-              addNewTag();
-            }}
+            onClick={addNewTag}
           >
             <MdAdd className="text-2xl text-blue-700 hover:text-white" />
           </button>
