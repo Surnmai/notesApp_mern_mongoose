@@ -24,19 +24,21 @@ const Navbar = () => {
   };
   return (
     <>
-      <div className="bg-white flex items-center justify-between container py-2 shadow-md">
-        <h2 className="text-xl font-medium text-black py-2">Notes</h2>
+      <div className="bg-white shadow-md">
+        <div className="flex items-center justify-between container py-2">
+          <h2 className="text-xl font-medium text-black py-2">Notes</h2>
 
-        <SearchBar
-          value={searchQuery}
-          onChange={({ target }) => {
-            setSearchQuery(target.value);
-          }}
-          handleSearch={handleSearch}
-          onClearSearch={onClearSearch}
-        />
+          <SearchBar
+            value={searchQuery}
+            onChange={({ target }) => {
+              setSearchQuery(target.value);
+            }}
+            handleSearch={handleSearch}
+            onClearSearch={onClearSearch}
+          />
 
-        <ProfileInfo onLogout={onLogout} />
+          <ProfileInfo onLogout={onLogout} />
+        </div>
       </div>
     </>
   );

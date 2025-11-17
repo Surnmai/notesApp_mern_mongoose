@@ -1,7 +1,10 @@
 import React, { useEffect } from "react";
 import NoteCard from "../../components/Cards/NoteCard";
-import { MdAdd } from "react-icons/md";
+import Toast from "../../components/Toast/Toast";
 import AddNotes from "./AddNotes";
+
+// import icons
+import { MdAdd } from "react-icons/md";
 
 // import modal
 import Modal from "react-modal";
@@ -25,10 +28,12 @@ const Home = () => {
     setUserInfo,
     setGetNotes,
     getNotes,
+    showToastMsg,
+    setShowToastMsg,
   } = useGlobalContext();
 
   // console.log(openEditModal.isShown);
-  console.log(getNotes);
+  // console.log(getNotes);
 
   const navigate = useNavigate();
 
@@ -58,6 +63,40 @@ const Home = () => {
     }
   };
 
+  // Delete Note
+  const deleteNote = async (note) => {
+    try {
+      const response = await axiosInstance.delete(
+        `/notes/delete-notes/${note?._id}`
+      );
+
+      if (response?.data && response?.data?.message) {
+        showToastMessage("Note Deleted Successfully", "delete");
+        getAllNotes();
+      }
+    } catch (error) {
+      if (
+        error?.response &&
+        error?.response.data &&
+        error?.response.data.message
+      ) {
+        setError("Unexpected error occurred");
+      }
+    }
+  };
+
+  const handleEdit = (notes) => {
+    setOpenEditModal({ isShown: true, data: notes, type: "edit" });
+  };
+
+  const showToastMessage = (message, type) => {
+    setShowToastMsg({ message, isShown: true, type });
+  };
+  const handleCloseToast = () => {
+    setShowToastMsg({ message: "", isShown: false });
+  };
+
+  // to fetch all user and notes data on component mount
   useEffect(() => {
     getAllNotes();
     getUserInfo();
@@ -77,8 +116,8 @@ const Home = () => {
               content={item.content}
               tags={item.tags}
               isPinned={item.isPinned}
-              onEdit={() => {}}
-              onDelete={() => {}}
+              onEdit={() => handleEdit(item)}
+              onDelete={() => deleteNote(item)}
               onPinNote={() => {}}
             />
           ))}
@@ -108,8 +147,16 @@ const Home = () => {
             setOpenEditModal({ isShown: false, type: "add", data: null });
           }}
           getAllNotes={getAllNotes}
+          showToastMessage={showToastMessage}
         />
       </Modal>
+
+      <Toast
+        isShown={showToastMsg.isShown}
+        message={showToastMsg.message}
+        type={showToastMsg.type}
+        onClose={handleCloseToast}
+      />
     </>
   );
 };

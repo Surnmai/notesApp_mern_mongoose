@@ -16,11 +16,13 @@ export const AppProvider = ({ children }) => {
     data: null,
   });
   const [inputValue, setInputValue] = useState("");
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [tags, setTags] = useState([]);
   const [userInfo, setUserInfo] = useState(null);
   const [getNotes, setGetNotes] = useState([]);
+  const [showToastMsg, setShowToastMsg] = useState({
+    isShown: false,
+    type: "add",
+    date: null,
+  });
 
   const toggleShowPassword = () => {
     setIsShowPassword(!isShowPassword);
@@ -46,16 +48,12 @@ export const AppProvider = ({ children }) => {
         setOpenEditModal,
         inputValue,
         setInputValue,
-        title,
-        setTitle,
-        content,
-        setContent,
-        tags,
-        setTags,
         userInfo,
         setUserInfo,
         getNotes,
         setGetNotes,
+        showToastMsg,
+        setShowToastMsg,
       }}
     >
       {children}

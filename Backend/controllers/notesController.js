@@ -93,7 +93,7 @@ const editNotes = async (req, res) => {
     if (!editedNote) {
       return res
         .status(400)
-        .json({ success: true, message: "Notes not found" });
+        .json({ success: true, message: "Notes not found", editedNote });
     }
 
     if (title) {

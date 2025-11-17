@@ -72,9 +72,10 @@
     padding-left: var(--container-padding);
     padding-right: var(--container-padding); */
 
-    @apply mx-auto; /* Center the container */
+    /* Center the container */
+    @apply mx-auto;
     width: 100%;
-    max-width: 100%;
+    /* max-width: 100%; */
     padding-left: var(--container-padding);
     padding-right: var(--container-padding);
 

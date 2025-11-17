@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 // import components
 import TagInput from "../../components/Input/TagInput";
@@ -12,9 +12,18 @@ import { MdClose } from "react-icons/md";
 // import axis Instance
 import axiosInstance from "../../utils/axiosinstance";
 
-const AddNotes = ({ noteData, type, onClose, getAllNotes }) => {
-  const { content, setContent, tags, title, setTitle, error, setError } =
-    useGlobalContext();
+const AddNotes = ({
+  noteData,
+  type,
+  onClose,
+  getAllNotes,
+  showToastMessage,
+}) => {
+  const [title, setTitle] = useState(noteData?.title || "");
+  const [content, setContent] = useState(noteData?.content || "");
+  const [tags, setTags] = useState(noteData?.tags || []);
+
+  const { error, setError } = useGlobalContext();
 
   // Add Note
   const addNewNote = async () => {
@@ -25,29 +34,55 @@ const AddNotes = ({ noteData, type, onClose, getAllNotes }) => {
         tags,
       });
 
-      if (response.data && response.data.note) {
+      if (response?.data && response?.data?.note) {
+        showToastMessage("Note Added Successfully");
         getAllNotes();
         onClose();
       }
     } catch (error) {
       if (
-        error.response &&
-        error.response.data &&
-        error.response.data.message
+        error?.response &&
+        error?.response.data &&
+        error?.response.data.message
       ) {
-        setError(error.response.data.message);
+        setError(error?.response?.data?.message);
       }
     }
   };
 
   // Edit Note
-  const editNote = async () => {};
+  const editNote = async () => {
+    try {
+      const response = await axiosInstance.put(
+        `/notes/edit-notes/${noteData?._id}`,
+        {
+          title,
+          content,
+          tags,
+        }
+      );
+
+      if (response?.data && response?.data?.editedNote) {
+        showToastMessage("Note Updated Successfully");
+        getAllNotes();
+        onClose();
+      }
+    } catch (error) {
+      if (
+        error?.response &&
+        error?.response.data &&
+        error?.response.data.message
+      ) {
+        setError(error?.response?.data?.message);
+      }
+    }
+  };
 
   const handleAddNote = () => {
     if (!title) return setError("Please enter the title");
     if (!content) return setError("Please enter the content");
     setError("");
-    if (type === "Edit") {
+    if (type === "edit") {
       editNote();
     } else {
       addNewNote();
@@ -94,7 +129,7 @@ const AddNotes = ({ noteData, type, onClose, getAllNotes }) => {
 
       <div className="mt-3">
         <label className="input-label">TAGS</label>
-        <TagInput />
+        <TagInput tags={tags} setTags={setTags} />
       </div>
 
       {error && <p className="text-red-500 text-xs pt-4">{error}</p>}
@@ -103,7 +138,7 @@ const AddNotes = ({ noteData, type, onClose, getAllNotes }) => {
         className="btn-primary font-medium mt-5 p-3"
         onClick={handleAddNote}
       >
-        ADD
+        {type === "edit" ? "Update" : "Add"}
       </button>
     </>
   );

@@ -4,8 +4,8 @@ import { MdAdd, MdClose } from "react-icons/md";
 // import Global Context
 import { useGlobalContext } from "../../Context";
 
-const TagInput = () => {
-  const { inputValue, setInputValue, tags, setTags } = useGlobalContext();
+const TagInput = ({ tags, setTags }) => {
+  const { inputValue, setInputValue } = useGlobalContext();
 
   const handleInputChange = (e) => {
     setInputValue(e.target.value);
