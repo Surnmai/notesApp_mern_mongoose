@@ -23,6 +23,8 @@ export const AppProvider = ({ children }) => {
     type: "add",
     date: null,
   });
+  const [isSearch, setIsSearch] = useState(false);
+  const [allNotes, setAllNotes] = useState([]);
 
   const toggleShowPassword = () => {
     setIsShowPassword(!isShowPassword);
@@ -54,6 +56,10 @@ export const AppProvider = ({ children }) => {
         setGetNotes,
         showToastMsg,
         setShowToastMsg,
+        isSearch,
+        setIsSearch,
+        allNotes,
+        setAllNotes,
       }}
     >
       {children}

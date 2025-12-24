@@ -43,20 +43,27 @@ const SignUp = () => {
 
     // Sign Up API call
     try {
-      const response = await axiosInstance.post("/create-account ", {
+      const response = await axiosInstance.post("/create-account", {
         fullName: name,
         email: email,
         password: password,
       });
 
+      console.log("Backend response:", response.data);
+
       // Handle successful registration response
-      if (response.data && response.data.error) {
-        setError(response.data.message);
+      if (response.data && !response.data.success) {
+        setError(response.data.message || "Registration failed");
         return;
       }
 
       if (response.data && response.data.accessToken) {
         localStorage.setItem("token", response.data.accessToken);
+
+        // Clear form state if needed
+        setPassword("");
+
+        // Navigate to dashboard
         navigate("/dashboard");
       }
     } catch (error) {

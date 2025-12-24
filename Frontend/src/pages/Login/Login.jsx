@@ -38,6 +38,7 @@ const Login = () => {
       // Handle successful login
       if (response.data && response.data.accessToken) {
         localStorage.setItem("token", response.data.accessToken);
+        setPassword("");
         navigate("/dashboard");
       }
     } catch (error) {

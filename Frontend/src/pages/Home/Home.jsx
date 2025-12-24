@@ -20,6 +20,7 @@ import { useNavigate } from "react-router-dom";
 
 // import moment
 import moment from "moment";
+import EmptyCard from "../../components/EmptyCard/EmptyCard";
 
 const Home = () => {
   const {
@@ -45,7 +46,7 @@ const Home = () => {
         setUserInfo(response.data.user);
       }
     } catch (error) {
-      if (error.response.status === 401) {
+      if (error.response.status === 400) {
         localStorage.clear();
         navigate("/login");
       }
@@ -54,7 +55,7 @@ const Home = () => {
 
   const getAllNotes = async () => {
     try {
-      const response = await axiosInstance.get("notes/get-all-notes");
+      const response = await axiosInstance.get("/notes/get-all-notes");
       if (response.data && response.data.allNotes) {
         setGetNotes(response.data.allNotes);
       }
@@ -70,7 +71,7 @@ const Home = () => {
         `/notes/delete-notes/${note?._id}`
       );
 
-      if (response?.data && response?.data?.message) {
+      if (response?.data && response?.data?.success) {
         showToastMessage("Note Deleted Successfully", "delete");
         getAllNotes();
       }
@@ -107,21 +108,25 @@ const Home = () => {
   return (
     <>
       <section className="container">
-        <div className="grid grid-cols-3 gap-4 mt-8">
-          {getNotes.map((item, idx) => (
-            <NoteCard
-              key={item._id}
-              title={item.title}
-              date={moment(item.createdOn).format("Do MM YYYY")}
-              content={item.content}
-              tags={item.tags}
-              isPinned={item.isPinned}
-              onEdit={() => handleEdit(item)}
-              onDelete={() => deleteNote(item)}
-              onPinNote={() => {}}
-            />
-          ))}
-        </div>
+        {getNotes.length > 0 ? (
+          <div className="grid grid-cols-3 gap-4 mt-8">
+            {getNotes.map((item, idx) => (
+              <NoteCard
+                key={item._id}
+                title={item.title}
+                date={moment(item.createdOn).format("Do MM YYYY")}
+                content={item.content}
+                tags={item.tags}
+                isPinned={item.isPinned}
+                onEdit={() => handleEdit(item)}
+                onDelete={() => deleteNote(item)}
+                onPinNote={() => {}}
+              />
+            ))}
+          </div>
+        ) : (
+          <EmptyCard />
+        )}
       </section>
 
       <button

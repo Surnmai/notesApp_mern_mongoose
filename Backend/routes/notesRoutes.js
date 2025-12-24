@@ -7,6 +7,7 @@ const {
   getAllNotes,
   deleteNote,
   updatePinnedNote,
+  searchNotes,
 } = require("../controllers/notesController");
 
 // import middleware
@@ -19,5 +20,6 @@ router.put("/edit-notes/:noteID", authenticateToken, editNotes);
 router.get("/get-all-notes/", authenticateToken, getAllNotes);
 router.delete("/delete-notes/:noteID", authenticateToken, deleteNote);
 router.put("/update-notes-pinned/:noteID", authenticateToken, updatePinnedNote);
+router.get("/search-notes", authenticateToken, searchNotes);
 
 module.exports = router;

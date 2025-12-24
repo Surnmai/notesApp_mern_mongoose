@@ -63,7 +63,7 @@ const editNotes = async (req, res) => {
   let title, content, tags, isPinned;
 
   try {
-    ({ title, content, tags, isPinned } = req.body);
+    ({ title, content, tags } = req.body);
     if (!title && !content && !tags) {
       return res
         .status(400)
@@ -172,6 +172,7 @@ const deleteNote = async (req, res) => {
   }
 };
 
+// Update isPinned note
 const updatePinnedNote = async (req, res) => {
   const notesID = req.params.noteID;
 
@@ -215,10 +216,44 @@ const updatePinnedNote = async (req, res) => {
   }
 };
 
+// Search Notes
+const searchNotes = async (req, res) => {
+  const { userID } = req.user;
+  const { query } = req.query;
+
+  if (!query) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Search query is required" });
+  }
+
+  try {
+    const matchedNotes = await Notes.find({
+      userID,
+      $or: [
+        { title: { $regex: new RegExp(query, "i") } },
+        { content: { $regex: new RegExp(query, "i") } },
+      ],
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Note matched and query retrieved successfully",
+      notes: matchedNotes,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: true,
+      message: "Internal server error, Failed to search for user",
+    });
+  }
+};
+
 module.exports = {
   addNotes,
   editNotes,
   getAllNotes,
   deleteNote,
   updatePinnedNote,
+  searchNotes,
 };

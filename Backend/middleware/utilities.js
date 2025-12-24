@@ -15,10 +15,11 @@ const authenticateToken = (req, res, next) => {
   }
 
   try {
+    // get/extract user information after signing In by the user
     const decodedToken = jwt.verify(token, process.env.JWT_SECRETE_KEY);
     // console.log(decodedToken);
 
-    req.user = decodedToken;
+    req.user = decodedToken; //this holds the user information like fullName,email and ID
     next();
   } catch (error) {
     return res.status(500).json({

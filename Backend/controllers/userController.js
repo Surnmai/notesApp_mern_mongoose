@@ -46,9 +46,21 @@ const createUser = async (req, res) => {
     });
 
     // create access token
-    const accessToken = jwt.sign({ newUser }, process.env.JWT_SECRETE_KEY, {
-      expiresIn: "30m",
-    });
+
+    // This will make the page be redirected to the login page after creating an account on the frontend
+
+    // const accessToken = jwt.sign({ newUser }, process.env.JWT_SECRETE_KEY, {
+    //   expiresIn: "30m",
+    // });
+
+    // This won't
+    const accessToken = jwt.sign(
+      { userID: newUser?._id },
+      process.env.JWT_SECRETE_KEY,
+      {
+        expiresIn: "30m",
+      }
+    );
 
     if (newUser) {
       return res.status(200).json({
@@ -56,10 +68,10 @@ const createUser = async (req, res) => {
         accessToken,
         message: "User created/registered successfully",
         user: {
-          fullName: isUser.fullName,
-          email: isUser.email,
-          _id: isUser._id,
-          createdOn: isUser.createdOn,
+          fullName: newUser.fullName,
+          email: newUser.email,
+          _id: newUser._id,
+          createdOn: newUser.createdOn,
         },
       });
     } else {

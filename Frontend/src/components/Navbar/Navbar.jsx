@@ -8,6 +8,9 @@ import SearchBar from "../SearchBar/SearchBar";
 // import context
 import { useGlobalContext } from "../../Context";
 
+// import axios Instance
+import axiosInstance from "../../utils/axiosinstance";
+
 const Navbar = () => {
   const navigate = useNavigate();
 
@@ -16,11 +19,47 @@ const Navbar = () => {
     navigate("/login");
   };
 
-  const { setSearchQuery, searchQuery } = useGlobalContext();
+  const { userInfo, setSearchQuery, searchQuery, setIsSearch, setAllNotes } =
+    useGlobalContext();
 
-  const handleSearch = () => {};
+  // Search Note
+  const searchNote = async (query) => {
+    try {
+      const response = await axiosInstance.get("/notes/search-notes", {
+        params: { query },
+      });
+
+      if (response?.data && response?.data?.notes) {
+        setIsSearch(true);
+        setAllNotes(response.data.notes);
+      }
+    } catch (error) {
+      if (
+        error?.response &&
+        error?.response.data &&
+        error?.response.data.message
+      ) {
+        setError("Unexpected error occurred");
+      }
+    }
+  };
+
+  const handleSearch = () => {
+    if (searchQuery.trim()) {
+      searchNote(searchQuery.trim());
+    }
+  };
+
   const onClearSearch = () => {
     setSearchQuery("");
+    setIsSearch(false);
+  };
+
+  // Handle Enter key press in search
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
   };
   return (
     <>
@@ -28,14 +67,17 @@ const Navbar = () => {
         <div className="flex items-center justify-between container py-2">
           <h2 className="text-xl font-medium text-black py-2">Notes</h2>
 
-          <SearchBar
-            value={searchQuery}
-            onChange={({ target }) => {
-              setSearchQuery(target.value);
-            }}
-            handleSearch={handleSearch}
-            onClearSearch={onClearSearch}
-          />
+          {userInfo && (
+            <SearchBar
+              value={searchQuery}
+              onChange={({ target }) => {
+                setSearchQuery(target.value);
+              }}
+              onKeyDown={handleKeyDown}
+              handleSearch={handleSearch}
+              onClearSearch={onClearSearch}
+            />
+          )}
 
           <ProfileInfo onLogout={onLogout} />
         </div>
